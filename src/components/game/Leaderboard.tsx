@@ -2,9 +2,10 @@ import { motion } from "framer-motion";
 import { Trophy, Medal, Award } from "lucide-react";
 
 export interface ScoreEntry {
+  id: string;
   username: string;
   score: number;
-  date: string;
+  created_at: string;
 }
 
 interface LeaderboardProps {
@@ -50,7 +51,7 @@ const Leaderboard = ({ scores, currentUsername, onClose }: LeaderboardProps) => 
             <div className="space-y-2">
               {scores.slice(0, 10).map((entry, index) => (
                 <motion.div
-                  key={`${entry.username}-${entry.date}-${index}`}
+                  key={entry.id}
                   className={`flex items-center gap-3 p-3 rounded-xl ${
                     entry.username === currentUsername
                       ? "bg-primary/20 border border-primary/30"
