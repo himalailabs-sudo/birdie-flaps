@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Bird from "./Bird";
 import Pipe from "./Pipe";
 import Cloud from "./Cloud";
@@ -10,11 +10,11 @@ import GameOverlay from "./GameOverlay";
 // Game constants
 const GAME_WIDTH = 400;
 const GAME_HEIGHT = 600;
-const GRAVITY = 0.5;
-const FLAP_STRENGTH = -9;
-const PIPE_SPEED = 3;
+const GRAVITY = 0.4;
+const FLAP_STRENGTH = -8;
+const PIPE_SPEED = 2.5;
 const PIPE_WIDTH = 80;
-const PIPE_GAP = 160;
+const PIPE_GAP = 180;
 const PIPE_INTERVAL = 200;
 const BIRD_SIZE = 48;
 const BIRD_X = 100;
@@ -34,7 +34,8 @@ interface CloudData {
 }
 
 const FlappyBirdGame = () => {
-  const [gameState, setGameState] = useState<"idle" | "playing" | "gameover">("idle");
+  const [gameState, setGameState] = useState<"idle" | "countdown" | "playing" | "gameover">("idle");
+  const [countdown, setCountdown] = useState(3);
   const [birdY, setBirdY] = useState(GAME_HEIGHT / 2 - BIRD_SIZE / 2);
   const [birdVelocity, setBirdVelocity] = useState(0);
   const [pipes, setPipes] = useState<PipeData[]>([]);
@@ -48,6 +49,7 @@ const FlappyBirdGame = () => {
 
   const gameLoopRef = useRef<number>();
   const pipeTimerRef = useRef(0);
+  const countdownRef = useRef<NodeJS.Timeout>();
 
   // Calculate bird rotation based on velocity
   const getBirdRotation = () => {
@@ -73,14 +75,34 @@ const FlappyBirdGame = () => {
     }
   }, [gameState]);
 
-  const startGame = useCallback(() => {
+  const startCountdown = useCallback(() => {
     setBirdY(GAME_HEIGHT / 2 - BIRD_SIZE / 2);
     setBirdVelocity(0);
     setPipes([]);
     setScore(0);
     pipeTimerRef.current = 0;
-    setGameState("playing");
+    setCountdown(3);
+    setGameState("countdown");
   }, []);
+
+  // Countdown effect
+  useEffect(() => {
+    if (gameState !== "countdown") return;
+
+    if (countdown > 0) {
+      countdownRef.current = setTimeout(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else {
+      setGameState("playing");
+    }
+
+    return () => {
+      if (countdownRef.current) {
+        clearTimeout(countdownRef.current);
+      }
+    };
+  }, [gameState, countdown]);
 
   // Handle keyboard input
   useEffect(() => {
@@ -88,8 +110,8 @@ const FlappyBirdGame = () => {
       if (e.code === "Space" || e.key === " ") {
         e.preventDefault();
         if (gameState === "idle" || gameState === "gameover") {
-          startGame();
-        } else {
+          startCountdown();
+        } else if (gameState === "playing") {
           flap();
         }
       }
@@ -97,7 +119,7 @@ const FlappyBirdGame = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gameState, flap, startGame]);
+  }, [gameState, flap, startCountdown]);
 
   // Check collision
   const checkCollision = useCallback(
@@ -259,19 +281,37 @@ const FlappyBirdGame = () => {
         <Ground offset={groundOffset} />
 
         {/* Score */}
-        {gameState === "playing" && <ScoreDisplay score={score} />}
+        {(gameState === "playing" || gameState === "countdown") && <ScoreDisplay score={score} />}
+
+        {/* Countdown overlay */}
+        <AnimatePresence>
+          {gameState === "countdown" && countdown > 0 && (
+            <motion.div
+              key={countdown}
+              className="absolute inset-0 z-40 flex items-center justify-center"
+              initial={{ scale: 2, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <span className="text-8xl font-bold text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+                {countdown}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Overlays */}
         <AnimatePresence>
           {gameState === "idle" && (
-            <GameOverlay type="start" onStart={startGame} />
+            <GameOverlay type="start" onStart={startCountdown} />
           )}
           {gameState === "gameover" && (
             <GameOverlay
               type="gameover"
               score={score}
               highScore={highScore}
-              onStart={startGame}
+              onStart={startCountdown}
             />
           )}
         </AnimatePresence>
