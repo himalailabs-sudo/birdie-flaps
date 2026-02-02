@@ -10,8 +10,8 @@ import GameOverlay from "./GameOverlay";
 // Game constants
 const GAME_WIDTH = 400;
 const GAME_HEIGHT = 600;
-const GRAVITY = 0.4;
-const FLAP_STRENGTH = -8;
+const GRAVITY = 0.25;
+const FLAP_STRENGTH = -5.5;
 const PIPE_SPEED = 2.5;
 const PIPE_WIDTH = 80;
 const PIPE_GAP = 180;
