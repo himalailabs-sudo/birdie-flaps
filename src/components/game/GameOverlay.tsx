@@ -4,10 +4,11 @@ interface GameOverlayProps {
   type: "start" | "gameover";
   score?: number;
   highScore?: number;
+  username?: string;
   onStart: () => void;
 }
 
-const GameOverlay = ({ type, score = 0, highScore = 0, onStart }: GameOverlayProps) => {
+const GameOverlay = ({ type, score = 0, highScore = 0, username, onStart }: GameOverlayProps) => {
   return (
     <motion.div
       className="absolute inset-0 z-40 flex items-center justify-center bg-black/30 backdrop-blur-sm"
@@ -30,6 +31,11 @@ const GameOverlay = ({ type, score = 0, highScore = 0, onStart }: GameOverlayPro
             >
               Flabby Bird
             </motion.h1>
+            {username && (
+              <p className="text-lg text-muted-foreground mb-2">
+                Welcome, <span className="font-semibold text-foreground">{username}</span>!
+              </p>
+            )}
             <p className="text-muted-foreground mb-6 text-lg">
               Tap or press Space to flap!
             </p>

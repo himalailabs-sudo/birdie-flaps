@@ -6,6 +6,10 @@ import Cloud from "./Cloud";
 import Ground from "./Ground";
 import ScoreDisplay from "./ScoreDisplay";
 import GameOverlay from "./GameOverlay";
+import UsernameInput from "./UsernameInput";
+import Leaderboard from "./Leaderboard";
+import { useLeaderboard } from "@/hooks/useLeaderboard";
+import { Trophy } from "lucide-react";
 
 // Game constants
 const GAME_WIDTH = 400;
@@ -34,18 +38,20 @@ interface CloudData {
 }
 
 const FlappyBirdGame = () => {
-  const [gameState, setGameState] = useState<"idle" | "countdown" | "playing" | "gameover">("idle");
+  const [gameState, setGameState] = useState<"username" | "idle" | "countdown" | "playing" | "gameover">("username");
+  const [username, setUsername] = useState(() => {
+    return localStorage.getItem("flappyUsername") || "";
+  });
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [birdY, setBirdY] = useState(GAME_HEIGHT / 2 - BIRD_SIZE / 2);
   const [birdVelocity, setBirdVelocity] = useState(0);
   const [pipes, setPipes] = useState<PipeData[]>([]);
   const [clouds, setClouds] = useState<CloudData[]>([]);
   const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(() => {
-    const saved = localStorage.getItem("flappyHighScore");
-    return saved ? parseInt(saved, 10) : 0;
-  });
   const [groundOffset, setGroundOffset] = useState(0);
+
+  const { scores, addScore, getUserHighScore } = useLeaderboard();
 
   const gameLoopRef = useRef<number>();
   const pipeTimerRef = useRef(0);
@@ -74,6 +80,12 @@ const FlappyBirdGame = () => {
       setBirdVelocity(FLAP_STRENGTH);
     }
   }, [gameState]);
+
+  const handleUsernameSubmit = useCallback((name: string) => {
+    setUsername(name);
+    localStorage.setItem("flappyUsername", name);
+    setGameState("idle");
+  }, []);
 
   const startCountdown = useCallback(() => {
     setBirdY(GAME_HEIGHT / 2 - BIRD_SIZE / 2);
@@ -231,12 +243,9 @@ const FlappyBirdGame = () => {
 
     if (checkCollision(birdY, pipes)) {
       setGameState("gameover");
-      if (score > highScore) {
-        setHighScore(score);
-        localStorage.setItem("flappyHighScore", score.toString());
-      }
+      addScore(username, score);
     }
-  }, [birdY, pipes, gameState, checkCollision, score, highScore]);
+  }, [birdY, pipes, gameState, checkCollision, score, username, addScore]);
 
   const handleClick = () => {
     if (gameState === "playing") {
@@ -301,17 +310,52 @@ const FlappyBirdGame = () => {
           )}
         </AnimatePresence>
 
+        {/* Leaderboard button */}
+        {(gameState === "idle" || gameState === "gameover") && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowLeaderboard(true);
+            }}
+            className="absolute top-4 right-4 z-50 bg-card/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-card transition-colors"
+          >
+            <Trophy className="w-6 h-6 text-primary" />
+          </button>
+        )}
+
         {/* Overlays */}
         <AnimatePresence>
+          {gameState === "username" && (
+            <UsernameInput 
+              onSubmit={handleUsernameSubmit} 
+              savedUsername={username}
+            />
+          )}
           {gameState === "idle" && (
-            <GameOverlay type="start" onStart={startCountdown} />
+            <GameOverlay 
+              type="start" 
+              onStart={startCountdown}
+              username={username}
+            />
           )}
           {gameState === "gameover" && (
             <GameOverlay
               type="gameover"
               score={score}
-              highScore={highScore}
+              highScore={getUserHighScore(username)}
               onStart={startCountdown}
+              username={username}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Leaderboard modal */}
+        <AnimatePresence>
+          {showLeaderboard && (
+            <Leaderboard
+              scores={scores}
+              currentUsername={username}
+              onClose={() => setShowLeaderboard(false)}
             />
           )}
         </AnimatePresence>
