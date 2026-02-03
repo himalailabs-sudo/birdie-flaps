@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import Bird from "./Bird";
 import Pipe from "./Pipe";
 import Cloud from "./Cloud";
@@ -9,7 +10,7 @@ import GameOverlay from "./GameOverlay";
 import UsernameInput from "./UsernameInput";
 import Leaderboard from "./Leaderboard";
 import { useLeaderboard } from "@/hooks/useLeaderboard";
-import { Trophy } from "lucide-react";
+import { Trophy, ArrowLeft } from "lucide-react";
 
 // Game constants
 const GAME_WIDTH = 400;
@@ -255,6 +256,14 @@ const FlappyBirdGame = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen sky-gradient p-4">
+      {/* Back button */}
+      <Link
+        to="/"
+        className="absolute top-4 left-4 z-50 bg-card/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-card transition-colors"
+      >
+        <ArrowLeft className="w-6 h-6 text-foreground" />
+      </Link>
+
       <div
         className="relative overflow-hidden rounded-3xl game-shadow cursor-pointer select-none"
         style={{ width: GAME_WIDTH, height: GAME_HEIGHT }}
