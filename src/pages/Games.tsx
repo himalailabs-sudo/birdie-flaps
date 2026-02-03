@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Gamepad2 } from "lucide-react";
+import himalLogo from "@/assets/himal-ai-labs-logo.png";
 
 interface GameCardProps {
   title: string;
@@ -68,16 +69,11 @@ const Games = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex flex-col items-center justify-center gap-4 mb-6">
-            <img 
-              src="/favicon.png" 
-              alt="Himal AI Labs" 
-              className="w-48 h-48 rounded-3xl shadow-lg"
-            />
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900">
-              Himal AI Labs
-            </h1>
-          </div>
+          <img 
+            src={himalLogo} 
+            alt="Himal AI Labs" 
+            className="h-24 md:h-32 w-auto mb-6"
+          />
           <p className="text-xl text-slate-600 max-w-md mx-auto">
             Free browser games — no downloads, just fun!
           </p>
