@@ -51,8 +51,16 @@ const SnakeGame = () => {
   const handleUsernameSubmit = useCallback((name: string) => {
     setUsername(name);
     localStorage.setItem("snakeUsername", name);
-    setGameState("idle");
-  }, []);
+    // Go straight to countdown instead of idle
+    setSnake([{ x: 10, y: 10 }]);
+    setDirection("RIGHT");
+    directionRef.current = "RIGHT";
+    setScore(0);
+    speedRef.current = INITIAL_SPEED;
+    setFood(generateFood([{ x: 10, y: 10 }]));
+    setCountdown(3);
+    setGameState("countdown");
+  }, [generateFood]);
 
   // Start countdown
   const startCountdown = useCallback(() => {
