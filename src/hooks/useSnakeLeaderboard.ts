@@ -18,7 +18,7 @@ export const useSnakeLeaderboard = () => {
   useEffect(() => {
     const fetchScores = async () => {
       const { data, error } = await supabase
-        .from("snake_leaderboard")
+        .from("snake_leaderboard" as any)
         .select("*")
         .order("score", { ascending: false })
         .limit(MAX_SCORES);
@@ -26,7 +26,7 @@ export const useSnakeLeaderboard = () => {
       if (error) {
         console.error("Error fetching snake leaderboard:", error);
       } else {
-        setScores(data || []);
+        setScores((data as unknown as SnakeScoreEntry[]) || []);
       }
       setLoading(false);
     };
@@ -64,7 +64,7 @@ export const useSnakeLeaderboard = () => {
 
   const addScore = useCallback(async (username: string, score: number) => {
     const { data, error } = await supabase
-      .from("snake_leaderboard")
+      .from("snake_leaderboard" as any)
       .insert({ username, score })
       .select()
       .single();
@@ -74,7 +74,7 @@ export const useSnakeLeaderboard = () => {
       return null;
     }
 
-    return data;
+    return data as unknown as SnakeScoreEntry;
   }, []);
 
   const getHighScore = useCallback(() => {
