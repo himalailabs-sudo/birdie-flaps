@@ -71,7 +71,7 @@ const Games = () => {
           <img 
             src={himalLogo} 
             alt="Himal AI Labs" 
-            className="h-24 md:h-32 w-auto mb-6"
+            className="h-36 md:h-48 w-auto mb-6"
           />
           <p className="text-xl text-slate-600 max-w-md mx-auto">
             Free browser games — no downloads, just fun!
