@@ -223,7 +223,7 @@ const SnakeGame = () => {
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-emerald-900 to-emerald-950 p-4 overflow-hidden fixed inset-0">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-emerald-900 to-emerald-950 p-4">
       {/* Back button */}
       <Link
         to="/"
