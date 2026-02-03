@@ -61,9 +61,9 @@ const Games = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
       {/* Header */}
-      <header className="pt-16 pb-12 px-4">
+      <header className="pt-6 pb-8 px-4">
         <motion.div
-          className="max-w-4xl mx-auto text-center"
+          className="max-w-4xl mx-auto text-center flex flex-col items-center"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -71,7 +71,7 @@ const Games = () => {
           <img 
             src={himalLogo} 
             alt="Himal AI Labs" 
-            className="h-36 md:h-48 w-auto mb-6"
+            className="h-36 md:h-48 w-auto mb-6 mx-auto"
           />
           <p className="text-xl text-slate-600 max-w-md mx-auto">
             Free browser games — no downloads, just fun!
