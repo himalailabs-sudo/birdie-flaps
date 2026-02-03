@@ -319,8 +319,8 @@ const FlappyBirdGame = () => {
           )}
         </AnimatePresence>
 
-        {/* Leaderboard button */}
-        {(gameState === "idle" || gameState === "gameover") && (
+        {/* Leaderboard button - visible on username, idle, and gameover screens */}
+        {(gameState === "username" || gameState === "idle" || gameState === "gameover") && (
           <button
             onClick={(e) => {
               e.stopPropagation();
