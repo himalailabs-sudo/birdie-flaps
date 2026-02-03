@@ -48,14 +48,13 @@ const games: GameCardProps[] = [
     emoji: "🐦",
     gradient: "bg-gradient-to-br from-sky-400 to-emerald-500",
   },
-  // Add more games here as they're developed
-  // {
-  //   title: "Snake",
-  //   description: "Classic snake game - eat and grow!",
-  //   path: "/snake",
-  //   emoji: "🐍",
-  //   gradient: "bg-gradient-to-br from-green-500 to-lime-400",
-  // },
+  {
+    title: "Snake",
+    description: "Classic snake game - eat and grow!",
+    path: "/snake",
+    emoji: "🐍",
+    gradient: "bg-gradient-to-br from-emerald-500 to-lime-400",
+  },
 ];
 
 const Games = () => {
