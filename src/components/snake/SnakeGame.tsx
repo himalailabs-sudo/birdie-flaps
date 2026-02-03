@@ -268,15 +268,13 @@ const SnakeGame = () => {
         <ArrowLeft className="w-6 h-6 text-foreground" />
       </Link>
 
-      {/* Leaderboard button */}
-      {(gameState === "idle" || gameState === "gameover") && (
-        <button
-          onClick={() => setShowLeaderboard(true)}
-          className="absolute top-4 right-4 z-50 bg-card/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-card transition-colors"
-        >
-          <Trophy className="w-6 h-6 text-emerald-500" />
-        </button>
-      )}
+      {/* Leaderboard button - always visible */}
+      <button
+        onClick={() => setShowLeaderboard(true)}
+        className="absolute top-4 right-4 z-50 bg-card/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-card transition-colors"
+      >
+        <Trophy className="w-6 h-6 text-emerald-500" />
+      </button>
 
       {/* Score display */}
       <div className="mb-4 text-center">
