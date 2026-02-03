@@ -59,36 +59,36 @@ const games: GameCardProps[] = [
 
 const Games = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
       {/* Header */}
-      <header className="pt-12 pb-8 px-4">
+      <header className="pt-16 pb-12 px-4">
         <motion.div
           className="max-w-4xl mx-auto text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="flex flex-col items-center justify-center gap-4 mb-6">
             <img 
               src="/favicon.png" 
               alt="Himal AI Labs" 
-              className="w-12 h-12 rounded-xl"
+              className="w-48 h-48 rounded-3xl shadow-lg"
             />
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900">
               Himal AI Labs
             </h1>
           </div>
-          <p className="text-xl text-muted-foreground">
-            Free browser games - no downloads, just fun!
+          <p className="text-xl text-slate-600 max-w-md mx-auto">
+            Free browser games — no downloads, just fun!
           </p>
         </motion.div>
       </header>
 
       {/* Games Grid */}
-      <main className="px-4 pb-12">
+      <main className="px-4 pb-16">
         <div className="max-w-4xl mx-auto">
           <motion.h2
-            className="text-2xl font-semibold text-foreground/90 mb-6"
+            className="text-2xl font-semibold text-slate-800 mb-8 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -110,7 +110,7 @@ const Games = () => {
             
             {/* Coming Soon placeholder */}
             <motion.div
-              className="rounded-3xl border-2 border-dashed border-muted-foreground/30 h-64 flex flex-col items-center justify-center text-muted-foreground"
+              className="rounded-3xl border-2 border-dashed border-slate-300 h-64 flex flex-col items-center justify-center text-slate-500 bg-white/50"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -123,7 +123,7 @@ const Games = () => {
       </main>
 
       {/* Footer */}
-      <footer className="py-6 text-center text-muted-foreground text-sm">
+      <footer className="py-8 text-center text-slate-500 text-sm border-t border-slate-200">
         <p>© {new Date().getFullYear()} Himal AI Labs. All rights reserved.</p>
       </footer>
     </div>
