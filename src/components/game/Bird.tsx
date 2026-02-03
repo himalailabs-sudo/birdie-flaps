@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import birdImage from "@/assets/flappy-bird.jpg";
 
 interface BirdProps {
   y: number;
@@ -14,11 +13,29 @@ const Bird = ({ y, rotation }: BirdProps) => {
       animate={{ rotate: rotation }}
       transition={{ duration: 0.1 }}
     >
-      <img 
-        src={birdImage} 
-        alt="Flappy Bird" 
-        className="w-full h-full object-contain"
-      />
+      {/* Bird body */}
+      <div className="relative w-full h-full">
+        {/* Main body */}
+        <div className="absolute inset-0 bird-gradient rounded-full shadow-lg" />
+        
+        {/* Eye */}
+        <div className="absolute top-2 right-2 w-4 h-4 bg-white rounded-full shadow-inner">
+          <div className="absolute top-1 right-1 w-2 h-2 bg-gray-800 rounded-full" />
+        </div>
+        
+        {/* Beak */}
+        <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-3 bg-orange-600 rounded-r-full" />
+        
+        {/* Wing */}
+        <motion.div
+          className="absolute top-1/2 left-1 w-5 h-4 bg-orange-400 rounded-full origin-right"
+          animate={{ rotate: [-20, 20, -20] }}
+          transition={{ duration: 0.15, repeat: Infinity }}
+        />
+        
+        {/* Belly highlight */}
+        <div className="absolute bottom-2 left-2 w-6 h-4 bg-yellow-200 rounded-full opacity-50" />
+      </div>
     </motion.div>
   );
 };
