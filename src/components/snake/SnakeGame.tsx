@@ -407,10 +407,69 @@ const SnakeGame = () => {
         </AnimatePresence>
       </div>
 
-      {/* Mobile controls hint */}
-      <div className="mt-6 text-emerald-400 text-sm text-center">
-        <p className="hidden md:block">Use arrow keys or WASD to move</p>
-        <p className="md:hidden">Swipe to change direction</p>
+      {/* Mobile controls */}
+      <div className="mt-6 flex flex-col items-center gap-2">
+        {/* Up button */}
+        <button
+          onClick={() => {
+            if (gameState === "playing" && directionRef.current !== "DOWN") {
+              directionRef.current = "UP";
+              setDirection("UP");
+            }
+          }}
+          className="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-400 rounded-xl flex items-center justify-center shadow-lg transition-colors"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+        
+        {/* Left, Down, Right buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              if (gameState === "playing" && directionRef.current !== "RIGHT") {
+                directionRef.current = "LEFT";
+                setDirection("LEFT");
+              }
+            }}
+            className="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-400 rounded-xl flex items-center justify-center shadow-lg transition-colors"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <button
+            onClick={() => {
+              if (gameState === "playing" && directionRef.current !== "UP") {
+                directionRef.current = "DOWN";
+                setDirection("DOWN");
+              }
+            }}
+            className="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-400 rounded-xl flex items-center justify-center shadow-lg transition-colors"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <button
+            onClick={() => {
+              if (gameState === "playing" && directionRef.current !== "LEFT") {
+                directionRef.current = "RIGHT";
+                setDirection("RIGHT");
+              }
+            }}
+            className="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-400 rounded-xl flex items-center justify-center shadow-lg transition-colors"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        
+        <p className="text-emerald-400 text-xs mt-2 hidden md:block">Or use arrow keys / WASD</p>
       </div>
     </div>
   );
