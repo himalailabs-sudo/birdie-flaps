@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
+import SnakeUsernameInput from "./SnakeUsernameInput";
+import SnakeLeaderboard from "./SnakeLeaderboard";
+import { useSnakeLeaderboard } from "@/hooks/useSnakeLeaderboard";
 
 // Game constants
 const GRID_SIZE = 20;
@@ -16,16 +19,18 @@ type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
 type Position = { x: number; y: number };
 
 const SnakeGame = () => {
-  const [gameState, setGameState] = useState<"idle" | "countdown" | "playing" | "gameover">("idle");
+  const [gameState, setGameState] = useState<"username" | "idle" | "countdown" | "playing" | "gameover">("username");
+  const [username, setUsername] = useState(() => {
+    return localStorage.getItem("snakeUsername") || "";
+  });
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [snake, setSnake] = useState<Position[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Position>({ x: 15, y: 10 });
   const [_direction, setDirection] = useState<Direction>("RIGHT");
   const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(() => {
-    const saved = localStorage.getItem("snakeHighScore");
-    return saved ? parseInt(saved, 10) : 0;
-  });
+
+  const { scores, addScore, getUserHighScore } = useSnakeLeaderboard();
 
   const directionRef = useRef<Direction>("RIGHT");
   const gameLoopRef = useRef<NodeJS.Timeout>();
@@ -41,6 +46,12 @@ const SnakeGame = () => {
       };
     } while (currentSnake.some((seg) => seg.x === newFood.x && seg.y === newFood.y));
     return newFood;
+  }, []);
+
+  const handleUsernameSubmit = useCallback((name: string) => {
+    setUsername(name);
+    localStorage.setItem("snakeUsername", name);
+    setGameState("idle");
   }, []);
 
   // Start countdown
@@ -163,14 +174,7 @@ const SnakeGame = () => {
 
         // Check food collision
         if (head.x === food.x && head.y === food.y) {
-          setScore((prev) => {
-            const newScore = prev + 10;
-            if (newScore > highScore) {
-              setHighScore(newScore);
-              localStorage.setItem("snakeHighScore", newScore.toString());
-            }
-            return newScore;
-          });
+          setScore((prev) => prev + 10);
           setFood(generateFood(newSnake));
           // Increase speed
           speedRef.current = Math.max(MIN_SPEED, speedRef.current - SPEED_INCREMENT);
@@ -189,7 +193,14 @@ const SnakeGame = () => {
         clearInterval(gameLoopRef.current);
       }
     };
-  }, [gameState, food, generateFood, highScore]);
+  }, [gameState, food, generateFood]);
+
+  // Handle game over - submit score
+  useEffect(() => {
+    if (gameState === "gameover" && score > 0) {
+      addScore(username, score);
+    }
+  }, [gameState, score, username, addScore]);
 
   // Touch controls
   const handleSwipe = useCallback(
@@ -222,6 +233,23 @@ const SnakeGame = () => {
 
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
+  // Direction button handlers
+  const handleDirectionClick = (newDirection: Direction) => {
+    if (gameState !== "playing") return;
+    
+    const opposites: Record<Direction, Direction> = {
+      UP: "DOWN",
+      DOWN: "UP",
+      LEFT: "RIGHT",
+      RIGHT: "LEFT",
+    };
+    
+    if (directionRef.current !== opposites[newDirection]) {
+      directionRef.current = newDirection;
+      setDirection(newDirection);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-emerald-900 to-emerald-950 p-4">
       {/* Back button */}
@@ -232,10 +260,20 @@ const SnakeGame = () => {
         <ArrowLeft className="w-6 h-6 text-foreground" />
       </Link>
 
+      {/* Leaderboard button */}
+      {(gameState === "idle" || gameState === "gameover") && (
+        <button
+          onClick={() => setShowLeaderboard(true)}
+          className="absolute top-4 right-4 z-50 bg-card/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-card transition-colors"
+        >
+          <Trophy className="w-6 h-6 text-emerald-500" />
+        </button>
+      )}
+
       {/* Score display */}
       <div className="mb-4 text-center">
         <div className="text-4xl font-bold text-white mb-1">{score}</div>
-        <div className="text-emerald-300 text-sm">Best: {highScore}</div>
+        <div className="text-emerald-300 text-sm">Best: {getUserHighScore(username)}</div>
       </div>
 
       {/* Game board */}
@@ -327,6 +365,16 @@ const SnakeGame = () => {
           )}
         </AnimatePresence>
 
+        {/* Username input overlay */}
+        <AnimatePresence>
+          {gameState === "username" && (
+            <SnakeUsernameInput 
+              onSubmit={handleUsernameSubmit} 
+              savedUsername={username}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Start overlay */}
         <AnimatePresence>
           {gameState === "idle" && (
@@ -341,16 +389,8 @@ const SnakeGame = () => {
                 initial={{ scale: 0.8, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
               >
-                <motion.h1
-                  className="text-4xl font-bold text-primary mb-4"
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  🐍 Snake
-                </motion.h1>
-                <p className="text-muted-foreground mb-6">
-                  Use arrow keys or swipe to move!
-                </p>
+                <p className="text-muted-foreground mb-2">Playing as</p>
+                <p className="text-xl font-bold text-foreground mb-4">{username}</p>
                 <motion.button
                   onClick={startCountdown}
                   className="bg-emerald-500 text-white px-8 py-4 rounded-2xl text-xl font-semibold shadow-lg hover:bg-emerald-600 transition-colors"
@@ -389,7 +429,7 @@ const SnakeGame = () => {
                   <div className="bg-accent/20 rounded-xl p-4">
                     <p className="text-muted-foreground text-sm">Best</p>
                     <p className="text-2xl font-bold text-accent-foreground">
-                      {highScore}
+                      {getUserHighScore(username)}
                     </p>
                   </div>
                 </div>
@@ -411,12 +451,7 @@ const SnakeGame = () => {
       <div className="mt-6 flex flex-col items-center gap-2">
         {/* Up button */}
         <button
-          onClick={() => {
-            if (gameState === "playing" && directionRef.current !== "DOWN") {
-              directionRef.current = "UP";
-              setDirection("UP");
-            }
-          }}
+          onClick={() => handleDirectionClick("UP")}
           className="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-400 rounded-xl flex items-center justify-center shadow-lg transition-colors"
         >
           <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -427,12 +462,7 @@ const SnakeGame = () => {
         {/* Left, Down, Right buttons */}
         <div className="flex gap-2">
           <button
-            onClick={() => {
-              if (gameState === "playing" && directionRef.current !== "RIGHT") {
-                directionRef.current = "LEFT";
-                setDirection("LEFT");
-              }
-            }}
+            onClick={() => handleDirectionClick("LEFT")}
             className="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-400 rounded-xl flex items-center justify-center shadow-lg transition-colors"
           >
             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -441,12 +471,7 @@ const SnakeGame = () => {
           </button>
           
           <button
-            onClick={() => {
-              if (gameState === "playing" && directionRef.current !== "UP") {
-                directionRef.current = "DOWN";
-                setDirection("DOWN");
-              }
-            }}
+            onClick={() => handleDirectionClick("DOWN")}
             className="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-400 rounded-xl flex items-center justify-center shadow-lg transition-colors"
           >
             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -455,12 +480,7 @@ const SnakeGame = () => {
           </button>
           
           <button
-            onClick={() => {
-              if (gameState === "playing" && directionRef.current !== "LEFT") {
-                directionRef.current = "RIGHT";
-                setDirection("RIGHT");
-              }
-            }}
+            onClick={() => handleDirectionClick("RIGHT")}
             className="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-400 rounded-xl flex items-center justify-center shadow-lg transition-colors"
           >
             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -471,6 +491,17 @@ const SnakeGame = () => {
         
         <p className="text-emerald-400 text-xs mt-2 hidden md:block">Or use arrow keys / WASD</p>
       </div>
+
+      {/* Leaderboard modal */}
+      <AnimatePresence>
+        {showLeaderboard && (
+          <SnakeLeaderboard
+            scores={scores}
+            currentUsername={username}
+            onClose={() => setShowLeaderboard(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

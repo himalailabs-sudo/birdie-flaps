@@ -35,6 +35,27 @@ export type Database = {
         }
         Relationships: []
       }
+      snake_leaderboard: {
+        Row: {
+          created_at: string
+          id: string
+          score: number
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          score?: number
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          score?: number
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
